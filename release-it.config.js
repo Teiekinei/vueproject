@@ -19,44 +19,45 @@ module.exports = {
         ]
       },
       infile: 'CHANGELOG.md',
-      ignoreRecommendedBump: false,
+      ignoreRecommendedBump: true,
       strictSemVer: true
     }
   },
-  increment: ({ commits }) => {
-    if (commits.some(c => c.notes && c.notes.some(n => n.title === 'BREAKING CHANGE'))) {
-      return 'major';
-    }
-    if (commits.some(c => c.type === 'feat')) {
-      return 'minor';
-    }
-    if (commits.some(c => c.type === 'fix' || c.type === 'perf')) {
-      return 'patch';
-    }
 
-    // chore、docs、style、test 等不升版且不跳版本選擇
-    return null;
+  // 根據 commit 自動決定版本號，否則 null（不升版、不釋出）
+  increment: ({ commits }) => {
+    if (commits.some(c => c.notes?.some(n => n.title === 'BREAKING CHANGE'))) { return 'major'; }
+    if (commits.some(c => c.type === 'feat')) { return 'minor'; }
+    if (commits.some(c => c.type === 'fix' || c.type === 'perf')) { return 'patch'; }
+
+    return null; // chore、docs 等不升版
   },
+
   git: {
     commitMessage: 'chore: Release v${version}',
     tagName: 'v${version}',
     push: true,
     requireCleanWorkingDir: true,
-    requireBranch: 'main' // 或你預設的主要分支名稱，如 master
+    requireBranch: 'main'
   },
+
   github: {
     release: true
   },
+
   npm: {
     publish: false
   },
+
   hooks: {
-    // 釋出前確保遠端同步，避免推不上去
     'before:git:push': 'git pull --rebase'
   },
-  // 這是重點，當無版本升級時跳過整個釋出步驟（避免跳選擇）
+
+  // 自動跳過版本選擇，如果 increment 回傳 null，就整個跳過 release
+  // release-it 本身會自動略過（所以不需要多寫 skip）
+  // 若你還是想保險設定，可以加這個（不會造成問題）
   skip: {
-    changelog: false, // 你想要更新 changelog 就留 false
+    changelog: false,
     commit: false,
     tag: false,
     push: false,
