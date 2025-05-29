@@ -33,7 +33,8 @@ module.exports = {
     requireBranch: 'main'
   },
   github: {
-    release: true
+    release: true,
+    token: process.env.GITHUB_TOKEN
   },
   npm: {
     publish: false
