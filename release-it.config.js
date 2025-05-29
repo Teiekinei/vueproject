@@ -1,3 +1,5 @@
+const fs = require('node:fs');
+
 module.exports = {
   plugins: {
     '@release-it/conventional-changelog': {
@@ -23,16 +25,6 @@ module.exports = {
       strictSemVer: true
     }
   },
-
-  // 根據 commit 自動決定版本號，否則 null（不升版、不釋出）
-  increment: ({ commits }) => {
-    if (commits.some(c => c.notes?.some(n => n.title === 'BREAKING CHANGE'))) { return 'major'; }
-    if (commits.some(c => c.type === 'feat')) { return 'minor'; }
-    if (commits.some(c => c.type === 'fix' || c.type === 'perf')) { return 'patch'; }
-
-    return null; // chore、docs 等不升版
-  },
-
   git: {
     commitMessage: 'chore: Release v${version}',
     tagName: 'v${version}',
@@ -40,28 +32,23 @@ module.exports = {
     requireCleanWorkingDir: true,
     requireBranch: 'main'
   },
-
   github: {
     release: true
   },
-
   npm: {
     publish: false
   },
-
   hooks: {
+    'before:init': ({ commits }) => {
+      const shouldRelease = commits.some(c =>
+        c.notes?.some(n => n.title === 'BREAKING CHANGE')
+        || ['feat', 'fix', 'perf'].includes(c.type)
+      );
+      if (!shouldRelease) {
+        console.log('🛑 No version-worthy commits found. Skipping release.');
+        process.exit(0);
+      }
+    },
     'before:git:push': 'git pull --rebase'
-  },
-
-  // 自動跳過版本選擇，如果 increment 回傳 null，就整個跳過 release
-  // release-it 本身會自動略過（所以不需要多寫 skip）
-  // 若你還是想保險設定，可以加這個（不會造成問題）
-  skip: {
-    changelog: false,
-    commit: false,
-    tag: false,
-    push: false,
-    npm: true,
-    github: false
   }
 };
