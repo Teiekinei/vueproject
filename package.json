@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "release": "release-it",
+    "precommit-release": "git add . && git commit -m \"chore: auto commit before release\" || echo 'Nothing to commit'",
+    "release": "npm run precommit-release && release-it",
     "commit": "cz"
   },
   "config": {

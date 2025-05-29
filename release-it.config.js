@@ -1,20 +1,38 @@
 module.exports = {
   plugins: {
     '@release-it/conventional-changelog': {
-      preset: 'angular', // 遵循 Angular commit message 格式
-      infile: 'CHANGELOG.md' // 變更記錄檔案
+      preset: {
+        name: 'conventionalcommits',
+        types: [
+          { type: 'feat', section: '✨ Features | 新功能' },
+          { type: 'fix', section: '🐛 Bug Fixes | Bug 修復' },
+          { type: 'chore', section: '🎫 Chores | 其他更新' },
+          { type: 'docs', section: '📝 Documentation | 文檔' },
+          { type: 'style', section: '💄 Styles | 風格' },
+          { type: 'refactor', section: '♻ Code Refactoring | 代碼重構' },
+          { type: 'perf', section: '⚡ Performance Improvements | 性能優化' },
+          { type: 'test', section: '✅ Tests | 測試' },
+          { type: 'revert', section: '⏪ Reverts | 回退' },
+          { type: 'build', section: '👷‍ Build System | 構建' },
+          { type: 'ci', section: '🔧 Continuous Integration | CI 配置' },
+          { type: 'config', section: '🔨 CONFIG | 配置' }
+        ]
+      },
+      infile: 'CHANGELOG.md',
+      ignoreRecommendedBump: true,
+      strictSemVer: true
     }
   },
+  increment: 'conventionalcommits',
   git: {
-    // 用雙反斜線轉義 $，避免編輯器警告，同時 release-it 會正常解析
-    commitMessage: 'chore(release): v\\${version}',
-    tagName: 'v\\${version}',
+    commitMessage: 'chore: Release v${version}',
+    tagName: 'v${version}',
     push: true
   },
   github: {
-    release: true // 自動產生 GitHub Release
+    release: true
   },
   npm: {
-    publish: false // 若不發 npm 套件設 false
+    publish: false
   }
 };
