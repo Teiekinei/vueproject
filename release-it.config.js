@@ -19,7 +19,7 @@ module.exports = {
         ]
       },
       infile: 'CHANGELOG.md',
-      ignoreRecommendedBump: true,
+      ignoreRecommendedBump: false,
       strictSemVer: true
     }
   },
